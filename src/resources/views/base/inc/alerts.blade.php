@@ -19,25 +19,17 @@
                 ? JSON.parse(localStorage.getItem('backpack_alerts')) : {};
 
             // merge both php alerts and localstorage alerts
-            Object.entries($alerts_from_php).forEach(function(type) {
-                if(typeof $alerts_from_localstorage[type[0]] !== 'undefined') {
-                    type[1].forEach(function(msg) {
-                        $alerts_from_localstorage[type[0]].push(msg);
-                    });
+            Object.entries($alerts_from_php).forEach(([type, messages]) => {
+                if(typeof $alerts_from_localstorage[type] !== 'undefined') {
+                    $alerts_from_localstorage[type].push(...messages);
                 } else {
-                    $alerts_from_localstorage[type[0]] = type[1];
+                    $alerts_from_localstorage[type] = messages;
                 }
             });
 
             for (var type in $alerts_from_localstorage) {
                 let messages = new Set($alerts_from_localstorage[type]);
-
-                messages.forEach(function(text) {
-                    let alert = {};
-                    alert['type'] = type;
-                    alert['text'] = text;
-                    new Noty(alert).show()
-            });
+                messages.forEach(text => new Noty({type, text}).show());
             }
 
             // in the end, remove backpack alerts from localStorage

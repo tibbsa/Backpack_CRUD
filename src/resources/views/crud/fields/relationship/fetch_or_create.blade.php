@@ -281,9 +281,7 @@ function setupInlineCreateButtons(element) {
                 var $toPass = [];
 
                 $fields.forEach(function(value, index) {
-                    $valueFromForm = $serializedForm.filter(function(field) {
-                        return field.name === value
-                    });
+                    $valueFromForm = $serializedForm.filter(field => field.name === value);
                     $toPass.push($valueFromForm[0]);
 
                 });
@@ -674,7 +672,7 @@ function bpFieldInitFetchOrCreateElement(element) {
             var $dependency = $dependencies[i];
             //if element does not have a custom-selector attribute we use the name attribute
             if(typeof element.attr('data-custom-selector') === 'undefined') {
-                form.find('[name="'+$dependency+'"], [name="'+$dependency+'[]"]').change(function(el) {
+                form.find(`[name="${$dependency}"], [name="${$dependency}[]"]`).change(function(el) {
                         $(element.find('option:not([value=""])')).remove();
                         element.val(null).trigger("change");
                 });
@@ -694,6 +692,7 @@ function bpFieldInitFetchOrCreateElement(element) {
                 });
             }
         }
+
     }
 }
 
@@ -707,7 +706,7 @@ if (typeof processItemText !== 'function') {
 
         // try to retreive the item in app language; then fallback language; then first entry; if nothing found empty translation string
         return typeof $itemField === 'object' && $itemField !== null
-        ? $itemField[$appLang] ? $itemField[$appLang] : $itemField[$appLangFallback] ? $itemField[$appLangFallback] : Object.values($itemField)[0] ? Object.values($itemField)[0] : $emptyTranslation
+            ? $itemField[$appLang] ?? $itemField[$appLangFallback] ?? Object.values($itemField)[0] ?? $emptyTranslation
             : $itemField;
     }
 }

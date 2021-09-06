@@ -34,13 +34,11 @@
 
     $newAlerts = @json($backpack_alerts);
 
-    Object.entries($newAlerts).forEach(function(type) {
-        if(typeof $oldAlerts[type[0]] !== 'undefined') {
-            type[1].forEach(function(msg) {
-                $oldAlerts[type[0]].push(msg);
-            });
+    Object.entries($newAlerts).forEach(([type, messages]) => {
+        if(typeof $oldAlerts[type] !== 'undefined') {
+            $oldAlerts[type].push(...messages);
         } else {
-            $oldAlerts[type[0]] = type[1];
+            $oldAlerts[type] = messages;
         }
     });
 
@@ -94,7 +92,7 @@
         }
     @endif
 
-    window.crud = {
+    var crud = {
       exportButtons: JSON.parse('{!! json_encode($crud->get('list.export_buttons')) !!}'),
       functionsToRunOnDataTablesDrawEvent: [],
       addFunctionToDataTablesDrawEventQueue: function (functionName) {
@@ -261,7 +259,7 @@
   <script type="text/javascript">
     jQuery(document).ready(function($) {
 
-      window.crud.table = $("#crudTable").DataTable(window.crud.dataTableConfiguration);
+      crud.table = $("#crudTable").DataTable(crud.dataTableConfiguration);
 
       // move search bar
       $("#crudTable_filter").appendTo($('#datatable_search_stack' ));

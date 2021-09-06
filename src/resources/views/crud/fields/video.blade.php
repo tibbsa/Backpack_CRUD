@@ -184,7 +184,7 @@ $field['wrapper']['data-video'] = '';
 
         var fetchVimeo = function( videoId, callback ){
 
-            var api = 'https://vimeo.com/api/v2/video/'+videoId+'.json';
+            var api = `https://vimeo.com/api/v2/video/${videoId}.json`;
 
             var video = {
                 provider: 'vimeo',
@@ -194,12 +194,9 @@ $field['wrapper']['data-video'] = '';
                 url: null
             };
 
-            fetch(api).then(function(response) {
+            fetch(api).then(response => {
                 if(response.ok) {
-                    response.json().then(function(v) {
-
-                        v = v[0];
-
+                    response.json().then(([v]) => {
                         video.id = v.id;
                         video.title = v.title;
                         video.image = v.thumbnail_large || v.thumbnail_small;

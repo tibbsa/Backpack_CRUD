@@ -225,7 +225,7 @@
             $selectedOptions != [])
         {
             var optionsForSelect = [];
-            FetchAjaxFetchSelectedEntry(element).then(function(result) {
+            FetchAjaxFetchSelectedEntry(element).then(result => {
                 result.forEach(function(item) {
                     $itemText = processItemText(item, $fieldAttribute);
                     $itemValue = item[$connectedEntityKeyName];
@@ -255,20 +255,17 @@
         //we reselect the previously selected options if any.
         var selectedOptions = [];
 
-        var $currentValue = $item ? $value : {};
-
-        //we reselect the previously selected options if any.
-        Object.entries($currentValue).forEach(function(option) {
-            selectedOptions.push(option[0]);
-            var $option = new Option(option[1], option[0]);
+        for (const [key, value] of Object.entries($currentValue)) {
+            selectedOptions.push(key);
+            var $option = new Option(value, key);
             $(element).append($option);
-        });
+        }
 
         $(element).val(selectedOptions);
 
 
         if (!$allows_null && $item === false && $selectedOptions == null) {
-            fetchDefaultEntry(element).then(function(result) {
+            fetchDefaultEntry(element).then(result => {
                 var $item = JSON.parse(element.attr('data-current-value'));
                 $(element).append('<option value="'+$item[$modelKey]+'">'+$item[$fieldAttribute]+'</option>');
                 $(element).val($item[$modelKey]);
@@ -352,7 +349,7 @@
                 var $dependency = $dependencies[i];
                 //if element does not have a custom-selector attribute we use the name attribute
                 if(typeof element.attr('data-custom-selector') == 'undefined') {
-                    form.find('[name="'+$dependency+'"], [name="'+$dependency+'[]"]').change(function(el) {
+                    form.find(`[name="${$dependency}"], [name="${$dependency}[]"]`).change(function(el) {
                             $(element.find('option:not([value=""])')).remove();
                             element.val(null).trigger("change");
                     });
