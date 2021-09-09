@@ -68,6 +68,7 @@
         data-include-all-form-fields="{{ var_export($field['include_all_form_fields']) }}"
         data-current-value="{{ $field['value'] }}"
         data-field-multiple="{{var_export($field['multiple'])}}"
+        data-language="{{ str_replace('_', '-', app()->getLocale()) }}"
 
         @include('crud::fields.inc.attributes', ['default_class' =>  'form-control'])
 
@@ -113,7 +114,7 @@
     <!-- include select2 js-->
     <script src="{{ asset('packages/select2/dist/js/select2.full.min.js') }}"></script>
     @if (app()->getLocale() !== 'en')
-    <script src="{{ asset('packages/select2/dist/js/i18n/' . app()->getLocale() . '.js') }}"></script>
+    <script src="{{ asset('packages/select2/dist/js/i18n/' . str_replace('_', '-', app()->getLocale()) . '.js') }}"></script>
     @endif
     @endpush
 
@@ -154,12 +155,13 @@
             $item = true;
         }
         var selectedOptions = [];
-        var $currentValue = $item ? $value : '';
+        var $currentValue = $item ? $value : {};
 
-        for (const [key, value] of Object.entries($currentValue)) {
-            selectedOptions.push(key);
+        //we reselect the previously selected options if any.
+        Object.entries($currentValue).forEach(function(option) {
+            selectedOptions.push(option[0]);
             $(element).val(selectedOptions);
-        }
+        });
 
         if (!$allows_null && $item === false) {
             element.find('option:eq(0)').prop('selected', true);

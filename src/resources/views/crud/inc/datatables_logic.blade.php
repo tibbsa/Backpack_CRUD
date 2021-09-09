@@ -18,23 +18,29 @@
     // datatables caches the ajax responses with pageLength in LocalStorage so when changing this
     // settings in controller users get unexpected results. To avoid that we will reset
     // the table cache when both lengths don't match.
-    let $dtCachedInfo = JSON.parse(localStorage.getItem('DataTables_crudTable_/{{$crud->getRoute()}}')) ?? [];
+    let $dtCachedInfo = JSON.parse(localStorage.getItem('DataTables_crudTable_/{{$crud->getRoute()}}'))
+        ? JSON.parse(localStorage.getItem('DataTables_crudTable_/{{$crud->getRoute()}}')) : [];
     var $dtDefaultPageLength = {{ $crud->getDefaultPageLength() }};
+    let $dtStoredPageLength = localStorage.getItem('DataTables_crudTable_/{{$crud->getRoute()}}_pageLength');
 
-    if($dtCachedInfo.length !== 0 && $dtCachedInfo.length !== $dtDefaultPageLength) {
+    if(!$dtStoredPageLength && $dtCachedInfo.length !== 0 && $dtCachedInfo.length !== $dtDefaultPageLength) {
         localStorage.removeItem('DataTables_crudTable_/{{$crud->getRoute()}}');
     }
 
     // in this page we allways pass the alerts to localStorage because we can be redirected with
     // persistent table, and this way we guarantee non-duplicate alerts.
-    $oldAlerts = JSON.parse(localStorage.getItem('backpack_alerts')) ?? {};
+    $oldAlerts = JSON.parse(localStorage.getItem('backpack_alerts'))
+        ? JSON.parse(localStorage.getItem('backpack_alerts')) : {};
+
     $newAlerts = @json($backpack_alerts);
 
-    Object.entries($newAlerts).forEach(([type, messages]) => {
-        if(typeof $oldAlerts[type] !== 'undefined') {
-            $oldAlerts[type].push(...messages);
+    Object.entries($newAlerts).forEach(function(type) {
+        if(typeof $oldAlerts[type[0]] !== 'undefined') {
+            type[1].forEach(function(msg) {
+                $oldAlerts[type[0]].push(msg);
+            });
         } else {
-            $oldAlerts[type] = messages;
+            $oldAlerts[type[0]] = type[1];
         }
     });
 
@@ -88,7 +94,7 @@
         }
     @endif
 
-    var crud = {
+    window.crud = {
       exportButtons: JSON.parse('{!! json_encode($crud->get('list.export_buttons')) !!}'),
       functionsToRunOnDataTablesDrawEvent: [],
       addFunctionToDataTablesDrawEventQueue: function (functionName) {
@@ -255,14 +261,18 @@
   <script type="text/javascript">
     jQuery(document).ready(function($) {
 
-      crud.table = $("#crudTable").DataTable(crud.dataTableConfiguration);
+      window.crud.table = $("#crudTable").DataTable(window.crud.dataTableConfiguration);
 
       // move search bar
       $("#crudTable_filter").appendTo($('#datatable_search_stack' ));
       $("#crudTable_filter input").removeClass('form-control-sm');
 
       // move "showing x out of y" info to header
+      @if($crud->getSubheading())
+      $('#crudTable_info').hide();
+      @else
       $("#datatable_info_stack").html($('#crudTable_info')).css('display','inline-flex').addClass('animated fadeIn');
+      @endif
 
       @if($crud->getOperationSetting('resetButton') ?? true)
         // create the reset button
@@ -299,6 +309,13 @@
               text: "<strong>{{ trans('backpack::crud.ajax_error_title') }}</strong><br>{{ trans('backpack::crud.ajax_error_text') }}"
           }).show();
       });
+
+        // when changing page length in datatables, save it into localStorage
+        // so in next requests we know if the length changed by user
+        // or by developer in the controller.
+        $('#crudTable').on( 'length.dt', function ( e, settings, len ) {
+            localStorage.setItem('DataTables_crudTable_/{{$crud->getRoute()}}_pageLength', len);
+        });
 
       // make sure AJAX requests include XSRF token
       $.ajaxPrefilter(function(options, originalOptions, xhr) {
