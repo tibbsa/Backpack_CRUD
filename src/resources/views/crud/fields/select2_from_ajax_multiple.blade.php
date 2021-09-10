@@ -94,6 +94,7 @@
         var $dependencies = JSON.parse(element.attr('data-dependencies'));
         var $ajaxDelay = element.attr('data-ajax-delay');
         var $selectedOptions = typeof element.attr('data-selected-options') === 'string' ? JSON.parse(element.attr('data-selected-options')) : JSON.parse("[]");
+        var $fieldName = typeof element.attr('name') !== 'undefined' ? element.attr('name') : element.data('repeatable-input-name');
 
         var select2AjaxMultipleFetchSelectedEntries = function (element) {
             return new Promise(function (resolve, reject) {
@@ -135,7 +136,8 @@
                             return {
                                 q: params.term, // search term
                                 page: params.page, // pagination
-                                form: form.serializeArray() // all other form inputs
+                                form: form.serializeArray(), // all other form inputs
+                                ajax_trigger_input: {'row':element.attr('data-row-number'), 'element':$fieldName} //the names are purposedly big to avoid conflicts with any user inputs
                             };
                         } else {
                             return {

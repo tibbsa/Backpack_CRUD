@@ -258,6 +258,7 @@ function setupInlineCreateButtons(element) {
     var $parentLoadedFields = element.attr('data-parent-loaded-fields');
     var $includeMainFormFields = element.attr('data-include-main-form-fields') == 'false' ? false : (element.attr('data-include-main-form-fields') == 'true' ? true : element.attr('data-include-main-form-fields'));
     var $form = element.closest('form');
+    
 
     $inlineCreateButtonElement.on('click', function () {
 
@@ -525,6 +526,7 @@ function bpFieldInitFetchOrCreateElement(element) {
     var $selectedOptions = typeof element.attr('data-selected-options') === 'string' ? JSON.parse(element.attr('data-selected-options')) : JSON.parse(null);
     var $multiple = element.prop('multiple');
     var $ajaxDelay = element.attr('data-ajax-delay');
+    var $fieldName = typeof element.attr('name') !== 'undefined' ? element.attr('name') : element.data('repeatable-input-name');
 
     var FetchOrCreateAjaxFetchSelectedEntry = function (element) {
         return new Promise(function (resolve, reject) {
@@ -630,7 +632,8 @@ function bpFieldInitFetchOrCreateElement(element) {
                     return {
                         q: params.term, // search term
                         page: params.page, // pagination
-                        form: form.serializeArray() // all other form inputs
+                        form: form.serializeArray(), // all other form inputs
+                        ajax_trigger_input: {'row':element.attr('data-row-number'), 'element':$fieldName}
                     };
                 } else {
                     return {

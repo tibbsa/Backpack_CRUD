@@ -109,7 +109,8 @@
         var $dependencies = JSON.parse(element.attr('data-dependencies'));
         var $ajaxDelay = element.attr('data-ajax-delay');
         var $selectedOptions = typeof element.attr('data-selected-options') === 'string' ? JSON.parse(element.attr('data-selected-options')) : JSON.parse(null);
-
+        var $fieldName = typeof element.attr('name') !== 'undefined' ? element.attr('name') : element.data('repeatable-input-name');
+        
         var select2AjaxFetchSelectedEntry = function (element) {
             return new Promise(function (resolve, reject) {
                 $.ajax({
@@ -156,7 +157,8 @@
                         return {
                             q: params.term, // search term
                             page: params.page, // pagination
-                            form: form.serializeArray() // all other form inputs
+                            form: form.serializeArray(), // all other form inputs
+                            ajax_trigger_input: {'row':element.attr('data-row-number'), 'element':$fieldName}
                         };
                     } else {
                         return {
@@ -168,23 +170,37 @@
                 processResults: function (data, params) {
                     params.page = params.page || 1;
 
-                    var result = {
-                        results: $.map(data.data, function (item) {
-                            textField = $fieldAttribute;
-                            return {
-                                text: item[textField],
-                                id: item[$connectedEntityKeyName]
+                    if(data.data) {
+                        var result = {
+                            results: $.map(data.data, function (item) {
+                                textField = $fieldAttribute;
+                                return {
+                                    text: item[textField],
+                                    id: item[$connectedEntityKeyName]
+                                }
+                            }),
+                           pagination: {
+                                 more: data.current_page < data.last_page
+                           }
+                        };
+                        }else {
+                            var result = {
+                                results: $.map(data, function (item) {
+                                    textField = $fieldAttribute;
+                                    return {
+                                        text: item[textField],
+                                        id: item[$connectedEntityKeyName]
+                                    }
+                                }),
+                                pagination: {
+                                    more: false,
+                                }
                             }
-                        }),
-                        pagination: {
-                                more: data.current_page < data.last_page
                         }
-                    };
-
-                    return result;
+                        return result;
+                    },
+                    cache: true
                 },
-                cache: true
-            },
         });
 
         // if we have selected options here we are on a repeatable field, we need to fetch the options with the keys
