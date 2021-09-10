@@ -149,17 +149,34 @@
                     processResults: function (data, params) {
                         params.page = params.page || 1;
 
-                        return {
+                        if(data.data) {
+                        var result = {
                             results: $.map(data.data, function (item) {
+                                textField = $fieldAttribute;
                                 return {
-                                    text: item[$fieldAttribute],
+                                    text: item[textField],
                                     id: item[$connectedEntityKeyName]
                                 }
                             }),
-                            pagination: {
+                           pagination: {
                                  more: data.current_page < data.last_page
-                            }
+                           }
                         };
+                        }else {
+                            var result = {
+                                results: $.map(data, function (item) {
+                                    textField = $fieldAttribute;
+                                    return {
+                                        text: item[textField],
+                                        id: item[$connectedEntityKeyName]
+                                    }
+                                }),
+                                pagination: {
+                                    more: false,
+                                }
+                            }
+                        }
+                        return result;
                     },
                     cache: true
                 },
