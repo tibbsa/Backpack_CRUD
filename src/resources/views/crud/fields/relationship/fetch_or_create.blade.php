@@ -612,75 +612,63 @@ function bpFieldInitFetchOrCreateElement(element) {
             if (!element.hasClass("select2-hidden-accessible")) {
 
 
-                    element.select2({
+                element.select2({
                     theme: "bootstrap",
                     placeholder: $placeholder,
                     minimumInputLength: $minimumInputLength,
                     allowClear: $allows_null,
                     ajax: {
-                    url: $dataSource,
-                    type: $method,
-                    dataType: 'json',
-                    delay: $ajaxDelay,
-                    data: function (params) {
-                    if ($includeAllFormFields) {
+                        url: $dataSource,
+                        type: $method,
+                        dataType: 'json',
+                        delay: $ajaxDelay,
+                        data: function (params) {
+                            if ($includeAllFormFields) {
 
-                    // we trigger this event so that fields in need to parse their value before sent in some ajax request,
-                    // case of repeatable, can catch it and be sent with main form.
-                    form.trigger('backpack_field.parse_value', element);
+                            // we trigger this event so that fields in need to parse their value before sent in some ajax request,
+                            // case of repeatable, can catch it and be sent with main form.
+                            form.trigger('backpack_field.parse_value', element);
 
-                    return {
-                        q: params.term, // search term
-                        page: params.page, // pagination
-                        form: form.serializeArray(), // all other form inputs
-                        ajax_trigger_input: {'row':element.attr('data-row-number'), 'element':$fieldName}
-                    };
-                } else {
-                    return {
-                        q: params.term, // search term
-                        page: params.page, // pagination
-                    };
-                }
-            },
-            processResults: function (data, params) {
-                params.page = params.page || 1;
-                //if we have data.data here it means we returned a paginated instance from controller.
-                //otherwise we returned one or more entries unpaginated.
-                if(data.data) {
-                var result = {
-                    results: $.map(data.data, function (item) {
-                        var $itemText = processItemText(item, $fieldAttribute);
+                            return {
+                                q: params.term, // search term
+                                page: params.page, // pagination
+                                form: form.serializeArray(), // all other form inputs
+                                ajax_trigger_input: {'row':element.attr('data-row-number'), 'element':$fieldName}
+                            };
+                            } else {
+                                return {
+                                    q: params.term, // search term
+                                    page: params.page, // pagination
+                                };
+                            }
+                        },
+                        processResults: function (data, params) {
+                            params.page = params.page || 1;
+                            //if we have data.data here it means we returned a paginated instance from controller.
+                            //otherwise we returned one or more entries unpaginated.
+                            if (data.data) {
+                                data = data.data;
+                                paginate = data.current_page < data.last_page
+                            }else{
+                                paginate = false;
+                            }
+                            return {
+                                results: $.map(data, function (item) {
+                                    var $itemText = processItemText(item, $fieldAttribute);
 
-                        return {
-                            text: $itemText,
-                            id: item[$connectedEntityKeyName]
-                        }
-                    }),
-                    pagination: {
-                            more: data.current_page < data.last_page
-                    }
-                };
-            }else {
-                var result = {
-                    results: $.map(data, function (item) {
-                        var $itemText = processItemText(item, $fieldAttribute);
-
-                        return {
-                            text: $itemText,
-                            id: item[$connectedEntityKeyName]
-                        }
-                    }),
-                    pagination: {
-                        more: false,
-                    }
-                }
-            }
-
-            return result;
-        },
-        cache: true
-        },
-        });
+                                    return {
+                                        text: $itemText,
+                                        id: item[$connectedEntityKeyName]
+                                    }
+                                }),
+                                pagination: {
+                                        more: paginate
+                                }
+                            };
+                        },
+                    cache: true
+                    },
+                });
 
         // if any dependencies have been declared
         // when one of those dependencies changes value

@@ -313,9 +313,14 @@
                         params.page = params.page || 1;
                         //if we have data.data here it means we returned a paginated instance from controller.
                         //otherwise we returned one or more entries unpaginated.
-                        if(data.data) {
-                        var result = {
-                            results: $.map(data.data, function (item) {
+                        if (data.data) {
+                            data = data.data;
+                            paginate = data.current_page < data.last_page
+                        }else{
+                            paginate = false;
+                        }
+                        return {
+                            results: $.map(data, function (item) {
                                 var $itemText = processItemText(item, $fieldAttribute);
 
                                 return {
@@ -323,27 +328,10 @@
                                     id: item[$connectedEntityKeyName]
                                 }
                             }),
-                           pagination: {
-                                 more: data.current_page < data.last_page
-                           }
-                        };
-                        }else {
-                            var result = {
-                                results: $.map(data, function (item) {
-                                    var $itemText = processItemText(item, $fieldAttribute);
-
-                                    return {
-                                        text: $itemText,
-                                        id: item[$connectedEntityKeyName]
-                                    }
-                                }),
-                                pagination: {
-                                    more: false,
-                                }
+                            pagination: {
+                                    more: paginate
                             }
-                        }
-
-                        return result;
+                        };
                     },
                     cache: true
                 },

@@ -170,37 +170,26 @@
                 processResults: function (data, params) {
                     params.page = params.page || 1;
 
-                    if(data.data) {
-                        var result = {
-                            results: $.map(data.data, function (item) {
-                                textField = $fieldAttribute;
-                                return {
-                                    text: item[textField],
-                                    id: item[$connectedEntityKeyName]
-                                }
-                            }),
-                           pagination: {
-                                 more: data.current_page < data.last_page
-                           }
-                        };
-                        }else {
-                            var result = {
-                                results: $.map(data, function (item) {
-                                    textField = $fieldAttribute;
-                                    return {
-                                        text: item[textField],
-                                        id: item[$connectedEntityKeyName]
-                                    }
-                                }),
-                                pagination: {
-                                    more: false,
-                                }
+                    if (data.data) {
+                        data = data.data;
+                        paginate = data.current_page < data.last_page
+                    }else{
+                        paginate = false;
+                    }
+                    return {
+                        results: $.map(data, function (item) {
+                            return {
+                                text: item[$fieldAttribute],
+                                id: item[$connectedEntityKeyName]
                             }
+                        }),
+                        pagination: {
+                                more: paginate
                         }
-                        return result;
-                    },
-                    cache: true
+                    };
                 },
+                cache: true
+            },
         });
 
         // if we have selected options here we are on a repeatable field, we need to fetch the options with the keys

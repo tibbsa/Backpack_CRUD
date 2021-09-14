@@ -149,34 +149,23 @@
                     processResults: function (data, params) {
                         params.page = params.page || 1;
 
-                        if(data.data) {
-                        var result = {
-                            results: $.map(data.data, function (item) {
-                                textField = $fieldAttribute;
+                        if (data.data) {
+                            data = data.data;
+                            paginate = data.current_page < data.last_page
+                        }else{
+                            paginate = false;
+                        }
+                        return {
+                            results: $.map(data, function (item) {
                                 return {
-                                    text: item[textField],
+                                    text: item[$fieldAttribute],
                                     id: item[$connectedEntityKeyName]
                                 }
                             }),
-                           pagination: {
-                                 more: data.current_page < data.last_page
-                           }
-                        };
-                        }else {
-                            var result = {
-                                results: $.map(data, function (item) {
-                                    textField = $fieldAttribute;
-                                    return {
-                                        text: item[textField],
-                                        id: item[$connectedEntityKeyName]
-                                    }
-                                }),
-                                pagination: {
-                                    more: false,
-                                }
+                            pagination: {
+                                    more: paginate
                             }
-                        }
-                        return result;
+                        };
                     },
                     cache: true
                 },
