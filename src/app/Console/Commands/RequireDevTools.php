@@ -35,63 +35,71 @@ class RequireDevTools extends Command
      */
     public function handle()
     {
-        $this->progressBar = $this->output->createProgressBar(29);
+        $this->progressBar = $this->output->createProgressBar(45);
         $this->progressBar->minSecondsBetweenRedraws(0);
         $this->progressBar->maxSecondsBetweenRedraws(120);
         $this->progressBar->setRedrawFrequency(1);
-
         $this->progressBar->start();
 
         $this->info(' Requiring DevTools. Please wait...');
         $this->progressBar->advance();
 
-        // Check if auth exists
-        $details = null;
-        $process = new Process(['composer', 'config', 'http-basic.backpackforlaravel.com']);
-        $process->run(function ($type, $buffer) use (&$details) {
-            if ($type !== Process::ERR && $buffer !== '') {
-                $details = json_decode($buffer);
-            } elseif (File::exists('auth.json')) {
-                $details = json_decode(File::get('auth.json'), true)['http-basic']['backpackforlaravel.com'] ?? false;
+        // Check if repositories exists
+        $this->composerRepositories();
+
+        // Check for authentication
+        $this->checkForAuthentication();
+
+        // Require DevTools
+        $this->requireDevTools();
+
+        // Check if devtools is installed
+        $tries = 2;
+        while (!file_exists('vendor/backpack/devtools/src/Console/Commands/InstallDevTools.php')) {
+            // Abort at nth try
+            if (--$tries === 0) {
+                return $this->error(' DevTools was not installed.');
             }
-            $this->progressBar->advance();
-        });
 
-        // Create an auth.json file
-        if (! $details) {
-            $this->info(' Creating auth.json file with your authentication token');
+            // Restart progress bar
+            $this->error('Please make sure your access token is correct.');
+            $this->progressBar->start();
 
-            $this->line(' (Find your access token details on https://backpackforlaravel.com/user/tokens)');
-            $username = $this->ask('Access token username');
-            $password = $this->ask('Access token password');
+            // Clear authentication
+            if (File::exists('auth.json')) {
+                $auth = json_decode(File::get('auth.json'));
+                if ($auth->{'http-basic'}->{'backpackforlaravel.com'} ?? false) {
+                    unset($auth->{'http-basic'}->{'backpackforlaravel.com'});
 
-            $process = new Process(['composer', 'config', 'http-basic.backpackforlaravel.com', $username, $password]);
-            $process->run(function ($type, $buffer) use ($username, $password) {
-                if ($type === Process::ERR) {
-                    // Fallback
-                    $authFile = [
-                        'http-basic' => [
-                            'backpackforlaravel.com' => [
-                                'username' => $username,
-                                'password' => $password,
-                            ],
-                        ],
-                    ];
-
-                    if (File::exists('auth.json')) {
-                        $currentFile = json_decode(File::get('auth.json'), true);
-                        if (! ($currentFile['http-basic']['backpackforlaravel.com'] ?? false)) {
-                            $authFile = array_merge_recursive($authFile, $currentFile);
-                        }
-                    }
-
-                    File::put('auth.json', json_encode($authFile, JSON_PRETTY_PRINT));
+                    File::put('auth.json', json_encode($auth, JSON_PRETTY_PRINT));
                 }
-                $this->progressBar->advance();
-            });
+            }
+
+            // Check for authentication
+            $this->checkForAuthentication();
+
+            // Require DevTools
+            $this->requireDevTools();
         }
 
-        // Check if repositories exists
+        // Finish
+        $this->progressBar->finish();
+        $this->info(' DevTools is now required.');
+
+        // DevTools inside installer
+        $this->info('');
+        $this->info(' Now running the DevTools installation command.');
+
+        // manually include the command in the run-time
+        if (!class_exists(\Backpack\DevTools\Console\Commands\InstallDevTools::class)) {
+            include base_path('vendor/backpack/devtools/src/Console/Commands/InstallDevTools.php');
+        }
+
+        $this->call(\Backpack\DevTools\Console\Commands\InstallDevTools::class);
+    }
+
+    public function composerRepositories()
+    {
         $details = null;
         $process = new Process(['composer', 'config', 'repositories.backpack/devtools']);
         $process->run(function ($type, $buffer) use (&$details) {
@@ -135,27 +143,65 @@ class RequireDevTools extends Command
                 $this->progressBar->advance();
             });
         }
+    }
 
+    public function checkForAuthentication()
+    {
+        // Check if auth exists
+        $details = null;
+        $process = new Process(['composer', 'config', 'http-basic.backpackforlaravel.com']);
+        $process->run(function ($type, $buffer) use (&$details) {
+            if ($type !== Process::ERR && $buffer !== '') {
+                $details = json_decode($buffer);
+            } elseif (File::exists('auth.json')) {
+                $details = json_decode(File::get('auth.json'), true)['http-basic']['backpackforlaravel.com'] ?? false;
+            }
+            $this->progressBar->advance();
+        });
+
+        // Create an auth.json file
+        if (!$details) {
+            $this->info(' Creating auth.json file with your authentication token');
+
+            $this->line(' (Find your access token details on https://backpackforlaravel.com/user/tokens)');
+            $username = $this->ask('Access token username');
+            $password = $this->ask('Access token password');
+
+            $process = new Process(['composer', 'config', 'http-basic.backpackforlaravel.com', $username, $password]);
+            $process->run(function ($type, $buffer) use ($username, $password) {
+                if ($type === Process::ERR) {
+                    // Fallback
+                    $authFile = [
+                        'http-basic' => [
+                            'backpackforlaravel.com' => [
+                                'username' => $username,
+                                'password' => $password,
+                            ],
+                        ],
+                    ];
+
+                    if (File::exists('auth.json')) {
+                        $currentFile = json_decode(File::get('auth.json'), true);
+                        if (!($currentFile['http-basic']['backpackforlaravel.com'] ?? false)) {
+                            $authFile = array_merge_recursive($authFile, $currentFile);
+                        }
+                    }
+
+                    File::put('auth.json', json_encode($authFile, JSON_PRETTY_PRINT));
+                }
+
+                $this->progressBar->advance();
+            });
+        }
+    }
+
+    public function requireDevTools()
+    {
         // Require package
         $process = new Process(['composer', 'require', '--dev', '--with-all-dependencies', 'backpack/devtools']);
         $process->setTimeout(300);
         $process->run(function ($type, $buffer) {
             $this->progressBar->advance();
         });
-
-        // Finish
-        $this->progressBar->finish();
-        $this->info(' DevTools is now required.');
-
-        // DevTools inside installer
-        $this->info('');
-        $this->info(' Now running the DevTools installation command.');
-
-        // manually include the command in the run-time
-        if (! class_exists(\Backpack\DevTools\Console\Commands\InstallDevTools::class)) {
-            include base_path('vendor/backpack/devtools/src/Console/Commands/InstallDevTools.php');
-        }
-
-        $this->call(\Backpack\DevTools\Console\Commands\InstallDevTools::class);
     }
 }
