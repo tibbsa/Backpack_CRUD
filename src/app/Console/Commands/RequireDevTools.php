@@ -55,7 +55,7 @@ class RequireDevTools extends Command
 
         // Check if devtools is installed
         $tries = 2;
-        while (!file_exists('vendor/backpack/devtools/src/Console/Commands/InstallDevTools.php')) {
+        while (! file_exists('vendor/backpack/devtools/src/Console/Commands/InstallDevTools.php')) {
             // Abort at nth try
             if (--$tries === 0) {
                 return $this->error(' DevTools was not installed.');
@@ -91,7 +91,7 @@ class RequireDevTools extends Command
         $this->info(' Now running the DevTools installation command.');
 
         // manually include the command in the run-time
-        if (!class_exists(\Backpack\DevTools\Console\Commands\InstallDevTools::class)) {
+        if (! class_exists(\Backpack\DevTools\Console\Commands\InstallDevTools::class)) {
             include base_path('vendor/backpack/devtools/src/Console/Commands/InstallDevTools.php');
         }
 
@@ -160,7 +160,7 @@ class RequireDevTools extends Command
         });
 
         // Create an auth.json file
-        if (!$details) {
+        if (! $details) {
             $this->info(' Creating auth.json file with your authentication token');
 
             $this->line(' (Find your access token details on https://backpackforlaravel.com/user/tokens)');
@@ -182,7 +182,7 @@ class RequireDevTools extends Command
 
                     if (File::exists('auth.json')) {
                         $currentFile = json_decode(File::get('auth.json'), true);
-                        if (!($currentFile['http-basic']['backpackforlaravel.com'] ?? false)) {
+                        if (! ($currentFile['http-basic']['backpackforlaravel.com'] ?? false)) {
                             $authFile = array_merge_recursive($authFile, $currentFile);
                         }
                     }
