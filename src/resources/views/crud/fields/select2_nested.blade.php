@@ -47,6 +47,7 @@
         id="{{ $field['name'] }}"
         style="width: 100%"
         data-init-function="bpFieldInitSelect2NestedElement"
+        data-field-is-inline="{{var_export($inlineCreate ?? false)}}"
         data-language="{{ str_replace('_', '-', app()->getLocale()) }}"
         @include('crud::fields.inc.attributes', ['default_class' =>  'form-control select2_field'])
         >
@@ -102,8 +103,11 @@
             function bpFieldInitSelect2NestedElement(element) {
                 if (!element.hasClass("select2-hidden-accessible"))
                 {
+                    let $isFieldInline = element.data('field-is-inline');
+
                     element.select2({
-                        theme: "bootstrap"
+                        theme: "bootstrap",
+                        dropdownParent: $isFieldInline ? $('#inline-create-dialog .modal-content') : document.body
                     });
                 }
             }
