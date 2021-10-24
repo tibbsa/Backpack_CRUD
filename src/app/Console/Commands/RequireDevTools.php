@@ -71,16 +71,6 @@ class RequireDevTools extends Command
             $this->error(' DevTools was not installed, trying again ...');
             $this->progressBar->start();
 
-            // Clear authentication
-            if (File::exists('auth.json')) {
-                $auth = json_decode(File::get('auth.json'));
-                if ($auth->{'http-basic'}->{'backpackforlaravel.com'} ?? false) {
-                    unset($auth->{'http-basic'}->{'backpackforlaravel.com'});
-
-                    File::put('auth.json', json_encode($auth, JSON_PRETTY_PRINT));
-                }
-            }
-
             // Check for authentication
             $this->checkForAuthentication();
 
@@ -210,6 +200,16 @@ class RequireDevTools extends Command
             if (strpos($buffer, 'Permission denied') !== false) {
                 $this->progressBar->advance();
                 $this->error(' Permission denied. Could not authenticate the credentials.');
+
+                // Clear authentication
+                if (File::exists('auth.json')) {
+                    $auth = json_decode(File::get('auth.json'));
+                    if ($auth->{'http-basic'}->{'backpackforlaravel.com'} ?? false) {
+                        unset($auth->{'http-basic'}->{'backpackforlaravel.com'});
+
+                        File::put('auth.json', json_encode($auth, JSON_PRETTY_PRINT));
+                    }
+                }
             }
 
             if (strpos($buffer, 'curl error') !== false) {
