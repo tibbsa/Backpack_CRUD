@@ -58,11 +58,17 @@ class RequireDevTools extends Command
         while (! file_exists('vendor/backpack/devtools/src/Console/Commands/InstallDevTools.php')) {
             // Abort at nth try
             if (--$tries === 0) {
-                return $this->error(' DevTools was not installed.');
+                $this->info('');
+                $this->box('DevTools was not installed', 'error');
+                $this->note('Could not authenticate those credentials. This could be due to incorrect credentials or a network error.', 'error');
+                $this->note('If you\'re certain the credentials are correct, please try again.', 'error');
+                $this->line('');
+
+                return;
             }
 
             // Restart progress bar
-            $this->error('Please make sure your access token is correct.');
+            $this->error(' DevTools was not installed, trying again ...');
             $this->progressBar->start();
 
             // Clear authentication
@@ -200,7 +206,18 @@ class RequireDevTools extends Command
         // Require package
         $process = new Process(['composer', 'require', '--dev', '--with-all-dependencies', 'backpack/devtools']);
         $process->setTimeout(300);
-        $process->run(function ($type, $buffer) {
+        $process->run(function ($type, $buffer) use ($process) {
+            if (strpos($buffer, 'Permission denied') !== false) {
+                $this->progressBar->advance();
+                $this->error(' Permission denied. Could not authenticate the credentials.');
+            }
+
+            if (strpos($buffer, 'curl error') !== false) {
+                $this->progressBar->advance();
+                $this->error(' Connection refused. Failed to connect due to network issues.');
+                $process->stop(0);
+            }
+
             $this->progressBar->advance();
         });
     }
