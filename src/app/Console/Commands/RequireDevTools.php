@@ -4,6 +4,8 @@ namespace Backpack\CRUD\app\Console\Commands;
 
 use File;
 use Illuminate\Console\Command;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 use Str;
 use Symfony\Component\Process\Process;
 
@@ -197,6 +199,13 @@ class RequireDevTools extends Command
         $process = new Process(['composer', 'require', '--dev', '--with-all-dependencies', 'backpack/devtools']);
         $process->setTimeout(300);
         $process->run(function ($type, $buffer) use ($process) {
+            if($type === Process::ERR) {
+                // create a log channel
+                $log = new Logger('devtools_errors');
+                $log->pushHandler(new StreamHandler(storage_path('logs/devtools.log'), Logger::ERROR));
+
+                $log->error($buffer);
+            }
             if (strpos($buffer, 'Permission denied') !== false) {
                 $this->progressBar->advance();
                 $this->error(' Permission denied. Could not authenticate the credentials.');
