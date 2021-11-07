@@ -4,8 +4,6 @@ namespace Backpack\CRUD\app\Console\Commands;
 
 use File;
 use Illuminate\Console\Command;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 use Str;
 use Symfony\Component\Process\Process;
 
@@ -62,8 +60,8 @@ class RequireDevTools extends Command
             if (--$tries === 0) {
                 $this->info('');
                 $this->box('DevTools was not installed', 'error');
-                $this->note('Could not authenticate those credentials. This could be due to incorrect credentials or a network error.', 'error');
-                $this->note('If you\'re certain the credentials are correct, please try again.', 'error');
+                $this->note('For further information please check the log file.', 'error');
+                $this->note('You can also follow the manual installation process documented in https://backpackforlaravel.com/products/devtools', 'error');
                 $this->line('');
 
                 return;
@@ -200,12 +198,9 @@ class RequireDevTools extends Command
         $process->setTimeout(300);
         $process->run(function ($type, $buffer) use ($process) {
             if ($type === Process::ERR) {
-                // create a log channel
-                $log = new Logger('devtools_errors');
-                $log->pushHandler(new StreamHandler(storage_path('logs/devtools.log'), Logger::ERROR));
-
-                $log->error($buffer);
+                \Log::error($buffer);
             }
+
             if (strpos($buffer, 'Permission denied') !== false) {
                 $this->progressBar->advance();
                 $this->error(' Permission denied. Could not authenticate the credentials.');
