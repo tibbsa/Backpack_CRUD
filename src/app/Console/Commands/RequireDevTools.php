@@ -218,6 +218,12 @@ class RequireDevTools extends Command
                 $process->stop(0);
             }
 
+            if (strpos($buffer, 'Your requirements could not be resolved') !== false) {
+                $this->progressBar->advance();
+                $this->error($buffer);
+                $process->stop(0);
+            }
+
             $this->progressBar->advance();
         });
     }
