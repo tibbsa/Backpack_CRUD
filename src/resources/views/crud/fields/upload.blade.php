@@ -23,6 +23,7 @@
         @endif
             {{ $field['value'] }}
         </a>
+        <input type="hidden" value="{{$field['value']}}" name="{{$field['name']}}" />
     	<a href="#" class="file_clear_button btn btn-light btn-sm float-right" title="Clear file"><i class="la la-remove"></i></a>
     	<div class="clearfix"></div>
     </div>
@@ -34,7 +35,7 @@
             type="file"
             name="{{ $field['name'] }}"
             value="{{ old(square_brackets_to_dots($field['name'])) ?? $field['value'] ?? $field['default'] ?? '' }}"
-            @include('crud::fields.inc.attributes', ['default_class' =>  isset($field['value']) && $field['value']!=null?'file_input backstrap-file-input':'file_input backstrap-file-input'])
+            @include('crud::fields.inc.attributes', ['default_class' =>  'file_input backstrap-file-input'])
         >
         <label class="backstrap-file-label" for="customFile"></label>
     </div>
@@ -157,9 +158,8 @@
 
                     // redo the selector, so we can use the same fileInput variable going forward
                     fileInput = element.find(".file_input");
-
                     // add a hidden input with the same name, so that the setXAttribute method is triggered
-                    $("<input type='hidden' name='"+fieldName+"' value=''>").insertAfter(fileInput);
+                    $("<input type='hidden' name='"+fileInput.attr('name')+"' value=''>").insertAfter(fileInput);
                 });
 
                 fileInput.change(function() {
