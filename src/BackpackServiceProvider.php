@@ -5,12 +5,11 @@ namespace Backpack\CRUD;
 use Backpack\CRUD\app\Http\Middleware\ThrottlePasswordRecovery;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanel;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
 class BackpackServiceProvider extends ServiceProvider
@@ -53,52 +52,51 @@ class BackpackServiceProvider extends ServiceProvider
         $this->sendUsageStats();
 
         Validator::extend('backpack_upload_validator', function ($attribute, $value, $parameters, $validator) {
-            // we use ";" to distinguish between Laravel Validator parameters separated by "," from the inner rule parameters that developer 
+            // we use ";" to distinguish between Laravel Validator parameters separated by "," from the inner rule parameters that developer
             // may provide to validate the file. Example: "unique:table;id" would be translated into Laravel validation "unique:table,id"
-            $parameters = collect($parameters)->map(function($parameter) {
+            $parameters = collect($parameters)->map(function ($parameter) {
                 return Str::replace(';', ',', $parameter);
             })->implode('|');
 
             $validating_model = app('crud')->getCurrentEntry();
 
             // if value is a string it means that nothing has changed in field, we just make sure that both values match
-            if(is_string($value)) {
+            if (is_string($value)) {
                 //if there is a previous entry in database
-                if($validating_model) {
+                if ($validating_model) {
                     // check if it's not an array attribute and we can access the previous model value
-                    if(strpos($attribute,'.') === false) {
+                    if (strpos($attribute, '.') === false) {
                         return $value === $validating_model->{$attribute};
-                    }else{
+                    } else {
                         // if we are validating arrays, we make sure that this value exists in the array of previous values
                         $array_attribute = Str::afterLast($attribute, '.');
                         $model_attribute = Str::before($attribute, '.');
+
                         return in_array($value, array_column($validating_model->{$model_attribute}, $array_attribute));
                     }
-                    
                 }
                 // it can't be a string when creating
                 return false;
             }
 
-            // build the 
-            $attribute_for_validation = strpos($attribute,'.') === false ? $attribute : Str::before($attribute, '.').'.*.'.Str::afterLast($attribute, '.');
+            // build the
+            $attribute_for_validation = strpos($attribute, '.') === false ? $attribute : Str::before($attribute, '.').'.*.'.Str::afterLast($attribute, '.');
 
-            // transform dot notation attribute into a data array for validation 
-            if(strpos($attribute,'.') !== false) {
+            // transform dot notation attribute into a data array for validation
+            if (strpos($attribute, '.') !== false) {
                 $validation_input_array = [Str::before($attribute, '.') => [
                     [
                         Str::afterLast($attribute, '.') => $value,
-                    ]
+                    ],
                 ]];
             // just build the validation input
-            }else{
+            } else {
                 $validation_input_array = [Str::before($attribute, '.') => $value];
             }
-            
+
             // we check if the validator fails(), that's why our response to the validation is the negation of this operation result.
             // so if the `fails()` return `true`, means that this validator is failing, so we return `false` to the main validation instance
-            return !Validator::make($validation_input_array, [$attribute_for_validation => $parameters])->fails();
-            
+            return ! Validator::make($validation_input_array, [$attribute_for_validation => $parameters])->fails();
         });
     }
 
