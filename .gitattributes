@@ -1,0 +1,5 @@
+# https://mirrors.edge.kernel.org/pub/software/scm/git/docs/gitattributes.html
+# Add export-ignore to reduce package download size
+# See https://php.watch/articles/composer-gitattributes
+
+src/public/         export-ignore
