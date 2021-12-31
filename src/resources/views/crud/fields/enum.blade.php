@@ -1,6 +1,6 @@
 <!-- enum -->
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}">{!! $field['label'] !!}</label>
     @include('crud::fields.inc.translatable_icon')
     @php
         $entity_model = $crud->model;
@@ -8,6 +8,7 @@
     @endphp
     <select
         name="{{ $field['name'] }}"
+        id="{{ $field['name'] }}"
         @include('crud::fields.inc.attributes')
         >
 

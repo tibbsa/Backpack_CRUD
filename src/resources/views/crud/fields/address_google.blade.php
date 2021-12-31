@@ -19,7 +19,7 @@
 ?>
 
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}">{!! $field['label'] !!}</label>
     @include('crud::fields.inc.translatable_icon')
     <input type="hidden"
            value="{{ old($field['name']) ? old($field['name']) : (isset($field['value']) ? $field['value'] : (isset($field['default']) ? $field['default'] : '' )) }}"
@@ -30,6 +30,7 @@
             @if(isset($field['prefix']))
                 <div class="input-group-addon">{!! $field['prefix'] !!}</div> @endif
                 <input
+                        id="{{ $field['name'] }}"
                         type="text"
                         data-google-address="{&quot;field&quot;: &quot;{{$field['name']}}&quot;, &quot;full&quot;: {{isset($field['store_as_json']) && $field['store_as_json'] ? 'true' : 'false'}} }"
                         data-init-function="bpFieldInitAddressGoogleElement"

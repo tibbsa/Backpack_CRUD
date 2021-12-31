@@ -19,7 +19,7 @@
 
 @include('crud::fields.inc.wrapper_start')
     <div>
-        <label>{!! $field['label'] !!}</label>
+        <label for="{{ $field['name'] }}">{!! $field['label'] !!}</label>
         @include('crud::fields.inc.translatable_icon')
     </div>
     <!-- Wrap the image or canvas element with a block element (container) -->
@@ -40,7 +40,7 @@
     </div>
     <div class="btn-group">
         <div class="btn btn-light btn-sm btn-file">
-            {{ trans('backpack::crud.choose_file') }} <input type="file" accept="image/*" data-handle="uploadImage"  @include('crud::fields.inc.attributes', ['default_class' => 'hide'])>
+            {{ trans('backpack::crud.choose_file') }} <input type="file" accept="image/*" data-handle="uploadImage" id="{{ $field['name'] }}"  @include('crud::fields.inc.attributes', ['default_class' => 'hide'])>
             <input type="hidden" data-handle="hiddenImage" name="{{ $field['name'] }}" value="{{ $value }}">
         </div>
         @if(isset($field['crop']) && $field['crop'])

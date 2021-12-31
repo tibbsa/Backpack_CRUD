@@ -3,10 +3,11 @@
 @endphp
 <!-- select from array -->
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}@if (isset($field['allows_multiple']) && $field['allows_multiple']==true)[]@endif">{!! $field['label'] !!}</label>
     @include('crud::fields.inc.translatable_icon')
     <select
         name="{{ $field['name'] }}@if (isset($field['allows_multiple']) && $field['allows_multiple']==true)[]@endif"
+        id="{{ $field['name'] }}@if (isset($field['allows_multiple']) && $field['allows_multiple']==true)[]@endif"
         @include('crud::fields.inc.attributes')
         @if (isset($field['allows_multiple']) && $field['allows_multiple']==true)multiple @endif
         >

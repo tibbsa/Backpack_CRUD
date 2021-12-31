@@ -7,10 +7,11 @@
 @endphp
 
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}">{!! $field['label'] !!}</label>
     @include('crud::fields.inc.translatable_icon')
     <textarea
         name="{{ $field['name'] }}"
+        id="{{ $field['name'] }}"
         data-init-function="bpFieldInitSummernoteElement"
         data-options="{{ json_encode($field['options']) }}"
         @include('crud::fields.inc.attributes', ['default_class' =>  'form-control summernote'])

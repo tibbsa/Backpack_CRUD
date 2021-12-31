@@ -28,13 +28,13 @@ if($sortable){
 
 @include('crud::fields.inc.wrapper_start')
 
-    <div><label>{!! $field['label'] !!}</label></div>
+    <div><label for="{{ $field['name'] }}">{!! $field['label'] !!}</label></div>
     @include('crud::fields.inc.translatable_icon')
     <div class="list" data-field-name="{{ $field['name'] }}">
     @if ($multiple)
         <input type="hidden" data-marker="multipleBrowseInput" name="{{ $field['name'] }}" value="{{ json_encode($value) }}">
     @else
-        <input type="text" data-marker="multipleBrowseInput" name="{{ $field['name'] }}" value="{{ $value }}" @include('crud::fields.inc.attributes') readonly>
+        <input type="text" data-marker="multipleBrowseInput" id="{{ $field['name'] }}" name="{{ $field['name'] }}" value="{{ $value }}" @include('crud::fields.inc.attributes') readonly>
     @endif
 </div>
     <div class="btn-group" role="group" aria-label="..." style="margin-top: 3px;">

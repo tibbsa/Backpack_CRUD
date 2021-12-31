@@ -34,9 +34,10 @@
                 <input  type="radio"
                         class="form-check-input"
                         value="{{$value}}"
+                        id="{{ $field['name'] }}_{{ $value }}"
                         @include('crud::fields.inc.attributes')
                         >
-                <label class="{{ isset($field['inline']) && $field['inline'] ? 'radio-inline' : '' }} form-check-label font-weight-normal">{!! $label !!}</label>
+                <label class="{{ isset($field['inline']) && $field['inline'] ? 'radio-inline' : '' }} form-check-label font-weight-normal" for="{{ $field['name'] }}_{{ $value }}">{!! $label !!}</label>
             </div>
 
         @endforeach

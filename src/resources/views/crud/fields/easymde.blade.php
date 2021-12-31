@@ -1,9 +1,10 @@
 <!-- Simple MDE - Markdown Editor -->
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}">{!! $field['label'] !!}</label>
     @include('crud::fields.inc.translatable_icon')
     <textarea
         name="{{ $field['name'] }}"
+        id="{{ $field['name'] }}"
         data-init-function="bpFieldInitEasyMdeElement"
         data-easymdeAttributesRaw="{{ isset($field['easymdeAttributesRaw']) ? "{".$field['easymdeAttributesRaw']."}" : "{}" }}"
         data-easymdeAttributes="{{ isset($field['easymdeAttributes']) ? json_encode($field['easymdeAttributes']) : "{}" }}"

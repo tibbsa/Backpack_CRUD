@@ -1,6 +1,6 @@
 <!-- number input -->
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}">{!! $field['label'] !!}</label>
     @include('crud::fields.inc.translatable_icon')
 
     @if(isset($field['prefix']) || isset($field['suffix'])) <div class="input-group"> @endif
@@ -8,6 +8,7 @@
         <input
         	type="number"
         	name="{{ $field['name'] }}"
+            id="{{ $field['name'] }}"
             value="{{ old(square_brackets_to_dots($field['name'])) ?? $field['value'] ?? $field['default'] ?? '' }}"
             @include('crud::fields.inc.attributes')
         	>
