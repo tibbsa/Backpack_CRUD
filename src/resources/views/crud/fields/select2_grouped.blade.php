@@ -5,7 +5,7 @@
 @endphp
 
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}">{!! $field['label'] !!}</label>
     @include('crud::fields.inc.translatable_icon')
     @php
         $related_model = $crud->getRelationModel($field['entity']);
@@ -18,6 +18,7 @@
     @endphp
     <select
         name="{{ $field['name'] }}"
+        id="{{ $field['name'] }}"
         style="width: 100%"
         data-init-function="bpFieldInitSelect2GroupedElement"
         data-field-is-inline="{{var_export($inlineCreate ?? false)}}"

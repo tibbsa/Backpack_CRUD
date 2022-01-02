@@ -2,12 +2,13 @@
 
 @include('crud::fields.inc.wrapper_start')
 
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}">{!! $field['label'] !!}</label>
     @include('crud::fields.inc.translatable_icon')
 	<div class="input-group">
 		<input
 			type="text"
 			name="{{ $field['name'] }}"
+                        id="{{ $field['name'] }}"
 			value="{{ old(square_brackets_to_dots($field['name'])) ?? $field['value'] ?? $field['default'] ?? '' }}"
 			data-init-function="bpFieldInitBrowseElement"
 			data-elfinder-trigger-url="{{ url(config('elfinder.route.prefix').'/popup') }}"
@@ -20,10 +21,9 @@
 			<button type="button" data-inputid="{{ $field['name'] }}-filemanager" class="btn btn-light btn-sm popup_selector"><i class="la la-cloud-upload"></i> {{ trans('backpack::crud.browse_uploads') }}</button>
 			<button type="button" data-inputid="{{ $field['name'] }}-filemanager" class="btn btn-light btn-sm clear_elfinder_picker"><i class="la la-eraser"></i> {{ trans('backpack::crud.clear') }}</button>
 		</span>
-	</div>
 	@if (isset($field['hint']))
         <p class="help-block">{!! $field['hint'] !!}</p>
-    @endif
+        @endif
 
 @include('crud::fields.inc.wrapper_end')
 

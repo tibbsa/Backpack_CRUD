@@ -1,12 +1,13 @@
 <!-- configurable color picker -->
 {{-- https://farbelous.io/bootstrap-colorpicker/ --}}
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}">{!! $field['label'] !!}</label>
     @include('crud::fields.inc.translatable_icon')
     <div class="input-group colorpicker-component">
         <input
         	type="text"
-        	name="{{ $field['name'] }}"
+            id="{{ $field['name'] }}"
+            name="{{ $field['name'] }}"
             value="{{ old(square_brackets_to_dots($field['name'])) ?? $field['value'] ?? $field['default'] ?? '' }}"
             data-init-function="bpFieldInitColorPickerElement"
             @include('crud::fields.inc.attributes')

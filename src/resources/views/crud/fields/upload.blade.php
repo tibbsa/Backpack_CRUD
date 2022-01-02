@@ -6,7 +6,7 @@
 
 <!-- text input -->
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}">{!! $field['label'] !!}</label>
     @include('crud::fields.inc.translatable_icon')
 
 	{{-- Show the file name and a "Clear" button on EDIT form. --}}
@@ -32,6 +32,7 @@
     <div class="backstrap-file {{ isset($field['value']) && $field['value']!=null?'d-none':'' }}">
         <input
             type="file"
+            id="{{ $field['name'] }}"
             name="{{ $field['name'] }}"
             value="{{ old(square_brackets_to_dots($field['name'])) ?? $field['value'] ?? $field['default'] ?? '' }}"
             @include('crud::fields.inc.attributes', ['default_class' =>  isset($field['value']) && $field['value']!=null?'file_input backstrap-file-input':'file_input backstrap-file-input'])

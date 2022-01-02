@@ -3,9 +3,10 @@
     $field['allows_null'] = $field['allows_null'] ?? $crud->model::isColumnNullable($field['name']);
 @endphp
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}@if (isset($field['allows_multiple']) && $field['allows_multiple']==true)[]@endif">{!! $field['label'] !!}</label>
     <select
         name="{{ $field['name'] }}@if (isset($field['allows_multiple']) && $field['allows_multiple']==true)[]@endif"
+        id="{{ $field['name'] }}@if (isset($field['allows_multiple']) && $field['allows_multiple']==true)[]@endif"
         style="width: 100%"
         data-init-function="bpFieldInitSelect2FromArrayElement"
         data-field-is-inline="{{var_export($inlineCreate ?? false)}}"

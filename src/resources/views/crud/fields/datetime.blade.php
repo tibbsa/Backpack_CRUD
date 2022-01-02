@@ -13,11 +13,12 @@ $value = $timestamp ? strftime('%Y-%m-%dT%H:%M:%S', $timestamp) : '';
 @endphp
 
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}">{!! $field['label'] !!}</label>
     @include('crud::fields.inc.translatable_icon')
     <input
         type="datetime-local"
         name="{{ $field['name'] }}"
+        id="{{ $field['name'] }}"
         value="{{ $value }}"
         @include('crud::fields.inc.attributes')
         >

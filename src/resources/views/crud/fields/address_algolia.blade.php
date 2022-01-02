@@ -18,7 +18,7 @@
 ?>
 
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}">{!! $field['label'] !!}</label>
 
     @include('crud::fields.inc.translatable_icon')
 
@@ -40,6 +40,7 @@
         name="{{ $field['name'] }}"
         value="{{ $field['value'] }}"
         @endif
+        id="{{ $field['name'] }}"
         @include('crud::fields.inc.attributes')
     >
 

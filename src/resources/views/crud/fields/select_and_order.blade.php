@@ -5,7 +5,7 @@
 @endphp
 
 @include('crud::fields.inc.wrapper_start')
-    <label>{!! $field['label'] !!}</label>
+    <label for="{{ $field['name'] }}[]">{!! $field['label'] !!}</label>
     @include('crud::fields.inc.translatable_icon')
     <div class="row"
          data-init-function="bpFieldInitSelectAndOrderElement"
@@ -18,7 +18,8 @@
             {{-- The results will be stored here --}}
             <div data-identifier="results">
                 <select class="d-none" 
-                    name="{{ $field['name'] }}[]" 
+                    name="{{ $field['name'] }}[]"
+                    id="{{ $field['name'] }}[]"
                     data-selected-options='@json($values)'
                     multiple>
                 </select>
