@@ -145,9 +145,13 @@ trait ColumnsProtectedMethods
 
             // if the first part of the string exists as method,
             // it is a relationship
-            if (method_exists($model, $possibleMethodName)) {
-                $parts = explode('.', $column['name']);
-                $relation = $column['name'];
+            if (method_exists($this->model, $possibleMethodName)) {
+
+                // if it has parameters it's not a relation method.
+                $column['entity'] = $this->modelMethodHasParameters($this->model, $possibleMethodName) ? false : $column['name'];
+
+                $parts = explode('.', $column['entity']);
+
                 $attribute_in_relation = false;
 
                 $model = $this->model;
@@ -158,15 +162,9 @@ trait ColumnsProtectedMethods
                     try {
                         $model = $model->$part()->getRelated();
                     } catch (\Exception $e) {
-                        $relation = join('.', array_slice($parts, 0, $i));
                         $attribute_in_relation = true;
                     }
                 }
-
-                if (! isset($column['type'])) {
-                    $column['name'] = $column['entity'] = $relation;
-                }
-
                 // if the user setup the attribute in relation string, we are not going to infer that attribute from model
                 // instead we get the defined attribute by the user.
                 if ($attribute_in_relation) {
